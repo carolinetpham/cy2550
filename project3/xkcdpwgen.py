@@ -32,7 +32,8 @@ def main():
     parser.add_argument('-s', '--special', type=int, default=0, help='Add a random special character to the password')
     args = parser.parse_args()
 
-    print(generatePwrd(args.words, args.capital, args.number, args.special))
+    password = generatePwrd(args.words, args.capital, args.number, args.special)
+    print(password)
 
 # if the file is run directly, run the main function
 if __name__ == '__main__':
