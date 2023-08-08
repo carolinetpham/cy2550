@@ -17,9 +17,10 @@ def generatePwrd(words, capital, number, special):
             password = password[:position] + str(random.randint(0, 9)) + password[position:]
     # if special is true, add a random special character to the password
     if special > 0:
+        specialChars = ['!', '@', '#', '$', '%', '^', '&', '*', '(', ')', '_', '+', '-', '=', '[', ']', '{', '}', '|', '\\', ';', ':', '"', '\'', ',', '.', '<', '>', '/', '?']
         for _ in range(special):
             position = random.randint(0, len(password))
-            password = password[:position] + random.choice('!@#$%^&*()') + password[position:]
+            password = password[:position] + random.choice(specialChars) + password[position:]
 
     return password
 
