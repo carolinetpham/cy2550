@@ -1,75 +1,43 @@
-from random import randint
-import sys, getopt
+import argparse
+import random
 
-# Default values
-words = 4
-caps = 0
-numbers = 0
-symbols = 0
-specialChar = ['!', '@', '#', '$', '%', '^', '&', '*', '(', ')', '-', '_', '+', '=', '[', ']', '{', '}', '|', '\\', ':', ';', '"', "'", '<', '>', ',', '.', '?', '/']
+def run(args):
+    words = args.words
+    caps = args.caps
+    numbers = args.numbers
+    symbols = args.symbols
 
-# Get command line arguments
-try:
-    opts, args = getopt.getopt(sys.argv[1:], "hw:c:n:s:", ["help", "words=", "capitals=", "numbers=", "symbols="])
-except getopt.GetoptError:
-    print("Usage: xkcdpwgen [-h] [-w WORDS] [-c CAPS] [-n NUMBERS] [-s SYMBOLS]")
-    sys.exit(2)
+    with open('words.txt') as f:
+        wordList = [word.strip() for word in f.readlines()]
 
-# Parse command line arguments
-for opt, arg in opts:
-    if opt in ("-h", "--help"):
-        # Proper format:
-        print("usage: xkcdpwgen [-h] [-w WORDS] [-c CAPS] [-n NUMBERS] [-s SYMBOLS]\n\n" +
-              "Generate a secure, memorable password using the XKCD method\n\n" +
-              "optional arguments:\n" +
-              "    -h, --help            show this help message and exit\n" +
-              "    -w WORDS, --words WORDS\n" +
-              "                          include WORDS words in the password (default=4)\n" +
-              "    -c CAPS, --caps CAPS  capitalize the first letter of CAPS random words\n" +
-              "                          (default=0)\n" +
-              "    -n NUMBERS, --numbers NUMBERS\n" +
-              "                          insert NUMBERS random numbers in the password\n" +
-              "                          (default=0)\n" +
-              "    -s SYMBOLS, --symbols SYMBOLS\n" +
-              "                          insert SYMBOLS random symbols in the password\n" +
-              "                          (default=0)")
-        sys.exit()
-    # Set values based on command line arguments
-    elif opt in ("-w", "--words"):
-        words = int(arg)
-    elif opt in ("-c", "--caps"):
-        capitals = int(arg)
-    elif opt in ("-n", "--numbers"):
-        numbers = int(arg)
-    elif opt in ("-s", "--symbols"):
-        symbols = int(arg)
-# Check for invalid arguments
-with open("wordlist.txt") as f:
-    wordlist = f.read().splitlines()
+    passwordWords = random.choices(wordList, k=words)
+    if caps:
+        passwordWords = [word.capitalize() for word in passwordWords]
+    password = ''.join(passwordWords)
 
-# Generate password
-password = ""
+    if numbers:
+        for i in range(numbers):
+            position = random.randint(0, len(password))
+            password = password[:position] + str(random.randint(0, 9)) + password[position:]
 
-# Add words
-for i in range(words):
-    x = randint(0, len(wordlist) - 1)
-    temp = wordlist[x]
-    if caps >= (words - i):
-        temp = temp[0].upper() + temp[1:]
-    elif caps > 0:
-        if randint(0, 1) == 1:
-            temp = temp[0].upper() + temp[1:]
-            caps -= 1
-    password += temp
+    if symbols:
+        symbolList = ['!', '@', '#', '$', '%', '^', '&', '*', '(', ')', '-', '_', '+', '=', '[', ']', '{', '}', ';', ':', '<', '>', ',', '.', '?', '/']
+        for i in range(symbols):
+            position = random.randint(0, len(password))
+            password = password[:position] + random.choice(symbolList) + password[position:]
 
-# Add numbers and symbols
-for j in range(numbers):
-    x = randint(0, len(password) - 1)
-    password = password[:x] + str(randint(0, 9)) + password[x:]
+        return password
 
-for k in range(symbols):
-    x = randint(0, len(password) - 1)
-    password = password[:x] + specialChar[randint(0, len(specialChar) - 1)] + password[x:]
+    def main():
+        parser=argparse.ArgumentParser(description="Generate a secure, memorable password using the XKCD method")
+        parser.add_argument("-w", "--words", help="include WORDS words in the password (default=4)", dest="words", type=int, default=4)
+        parser.add_argument("-c", "--caps", help="capitalize the first letter of CAPS random words (default=0)", dest="caps", type=int, default=0)
+        parser.add_argument("-n", "--numbers", help="insert NUMBERS random numbers in the password (default=0)", dest="numbers", type=int, default=0)
+        parser.add_argument("-s", "--symbols", help="insert SYMBOLS random symbols in the password (default=0)", dest="symbols", type=int, default=0)
+        parser.set_defaults(func=run)
+        args=parser.parse_args()
+        args.func(args)
 
-# Print password
-print(password)
+    if __name__ == '__main__':
+        main()
+
