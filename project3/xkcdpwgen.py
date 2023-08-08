@@ -1,41 +1,48 @@
-import argparse
-import random
+from random import randint
+import sys, getopt
 
-def generatePwrd(words, capital, number, special):
-    # opens the file and reads the words
-    with open('words.txt', 'r') as f:
-        wrdList = [word.strip() for word in f.readlines()]
+words = 4
+capitals = 0
+numbers = 0
+symbols = 0
+specialChar = ['!', '@', '#', '$', '%', '^', '&', '*', '(', ')', '-', '_', '+', '=', '[', ']', '{', '}', '|', '\\', ':', ';', '"', "'", '<', '>', ',', '.', '?', '/']
 
-    pwdWords = random.choices(wrdList, k=words)
-    if capital:
-        pwdWords = [word.capitalize() for word in pwdWords]
-    password = ''.join(pwdWords)
-    # if number is true, add a random number to the password
-    if number > 0:
-        for _ in range(number):
-            position = random.randint(0, len(password))
-            password = password[:position] + str(random.randint(0, 9)) + password[position:]
-    # if special is true, add a random special character to the password
-    if special > 0:
-        specialChars = ['!', '@', '#', '$', '%', '^', '&', '*', '(', ')', '_', '+', '-', '=', '[', ']', '{', '}', '|', '\\', ';', ':', '"', '\'', ',', '.', '<', '>', '/', '?']
-        for _ in range(special):
-            position = random.randint(0, len(password))
-            password = password[:position] + random.choice(specialChars) + password[position:]
+try:
+    opts, args = getopt.getopt(sys.argv[1:], "hw:c:n:s:", ["help", "words=", "capitals=", "numbers=", "symbols="])
+except getopt.GetoptError:
+    print("Usage: xkcdpwgen.py [-w <words>] [-c <capitals>] [-n <numbers>] [-s <symbols>]")
+    sys.exit(2)
+for opt, arg in opts:
+    if opt in ("-h", "--help"):
+        print("Usage: xkcdpwgen.py [-w <words>] [-c <capitals>] [-n <numbers>] [-s <symbols>]")
+        sys.exit()
+    elif opt in ("-w", "--words"):
+        words = int(arg)
+    elif opt in ("-c", "--capitals"):
+        capitals = int(arg)
+    elif opt in ("-n", "--numbers"):
+        numbers = int(arg)
+    elif opt in ("-s", "--symbols"):
+        symbols = int(arg)
 
-    return password
+with open("wordlist.txt") as f:
+    wordlist = f.readlines()
 
-# main function
-def main():
-    parser = argparse.ArgumentParser(description='Generate a password using xkcd style')
-    parser.add_argument('-w', '--words', type=int, default=4, help='Number of words to use in the password')
-    parser.add_argument('-c', '--capital', action='store_true', help='Capitalize the first letter of each word')
-    parser.add_argument('-n', '--number', type=int, default=0, help='Add a random number to the password')
-    parser.add_argument('-s', '--special', type=int, default=0, help='Add a random special character to the password')
-    args = parser.parse_args()
-
-    password = generatePwrd(args.words, args.capital, args.number, args.special)
-    print(password)
-
-# if the file is run directly, run the main function
-if __name__ == '__main__':
-    main()
+password = ""
+for i in range(words):
+    password += wordlist[randint(0, len(wordlist)-1)].strip()
+    if i != words-1:
+        password += " "
+    if capitals > 0:
+        password = password.capitalize()
+        capitals -= 1
+    elif capitals < 0:
+        password = password.lower()
+        capitals += 1
+    if numbers > 0:
+        password += str(randint(0, 9))
+        numbers -= 1
+    if symbols > 0:
+        password += specialChar[randint(0, len(specialChar)-1)]
+        symbols -= 1
+print(password)
