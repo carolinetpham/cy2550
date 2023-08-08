@@ -7,19 +7,16 @@ def run(args):
     caps = args.caps
     numbers = args.numbers
     symbols = args.symbols
-
     # Read in the word list
     with open('words.txt') as f:
         wordList = [word.strip() for word in f.readlines()]
-
+    # Generate the password
     passwordWords = random.choices(wordList, k=words)
-
     # Capitalize random words
     if caps:
         passwordWords = [word.capitalize() for word in passwordWords]
     password = ''.join(passwordWords)
-
-    # Insert random numbers and symbols
+    # Insert numbers and symbols
     if numbers:
         for i in range(numbers):
             position = random.randint(0, len(password))
@@ -43,7 +40,24 @@ def main():
     args = parser.parse_args()
 
     password = run(args)
-    print(password)
+    # Print the password
+    print("Default password:", password)
+    # Print the password with the optional arguments
+    if args.words > 0:
+        words_password = run(args)
+        print("-w password:", words_password)
+
+    if args.caps > 0:
+        caps_password = run(args)
+        print("-c password:", caps_password)
+
+    if args.numbers > 0:
+        numbers_password = run(args)
+        print("-n password:", numbers_password)
+
+    if args.symbols > 0:
+        symbols_password = run(args)
+        print("-s password:", symbols_password)
 
 if __name__ == '__main__':
     main()
