@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 import argparse
 import random
 
@@ -40,4 +42,3 @@ def run(args):
 
     if __name__ == '__main__':
         main()
-
