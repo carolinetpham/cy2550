@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 import argparse
 import random
 
@@ -41,8 +40,9 @@ def main():
     args = parser.parse_args()
 
     password = run(args)
-    # Print the password
+    # Print the passworrd
     print(password)
+    return password
 
 if __name__ == '__main__':
     main()
